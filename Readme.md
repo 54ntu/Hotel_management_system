@@ -2,4 +2,6 @@
 
 <h2>This is a brief description of this Hotel management system..🚀</h2>
 <p>This project aims to cover all the requisities like user registeration, guest registeration with basic information,
-rooms details, here guest can check the availability of the rooms and can book rooms. Admin can manage all the operations like managing the staff, add them, assign task and shift to the staff.</p> 
+rooms details, here guest can check the availability of the rooms and can book rooms. Admin can manage all the operations like managing the staff, add them, assign task and shift to the staff.</p>
+
+# Getting started  :tada:
