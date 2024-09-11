@@ -23,7 +23,7 @@ class InventoryItem(models.Model):
 
 
 
-class Rooms(models.Model):
+class Room(models.Model):
      ROOM_CHOICES = [
           ('standard','STANDARD'),
           ('deluxe','DELUXE'),
@@ -41,7 +41,7 @@ class RoomBooking(models.Model):
      booked_by = models.ForeignKey(User,on_delete=models.CASCADE)
      check_in_date = models.DateTimeField()
      check_out_date = models.DateField()
-     room_number = models.ForeignKey(Rooms,on_delete= models.CASCADE)
+     room_number = models.ForeignKey(Room,on_delete= models.CASCADE)
      any_request = models.CharField(max_length=200)
 
 
