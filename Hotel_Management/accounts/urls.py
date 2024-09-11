@@ -1,6 +1,11 @@
 from django.urls import path
-from .views import  index
+from .views import  GuestRegistrationView
 
 urlpatterns = [
-    path('',index,name='index'),
+    path('guestRegister/',GuestRegistrationView.as_view({
+        'post':'create'
+    }),name='guest-register'),
+     path('guestLogin/',GuestRegistrationView.as_view({
+        'post':'login'
+    }),name='guest-login'),
 ]
