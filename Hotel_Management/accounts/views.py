@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from .serializers import GuestRegisterationSerializer,UserLoginSerializer
+from .serializers import GuestRegisterationSerializer,UserLoginSerializer,StaffRegistrationSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
@@ -51,3 +51,20 @@ class GuestRegistrationView(GenericViewSet,CreateModelMixin):
                       "errors":"email or password doesnot matched..!!!"
                  },
                  status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class StaffRegistrationViewsets(GenericViewSet,CreateModelMixin):
+     serializer_class = StaffRegistrationSerializer
+
+
+     def create(self, request, *args, **kwargs):
+
+          #check whether requesting of this views is a superuser or not
+          if not request.user.is_superuser:
+               return Response({
+                    "message":"you are not admin to perform this action...!!"
+               },
+               status=status.HTTP_403_FORBIDDEN
+          )
+          return super().create(request, *args, **kwargs)
