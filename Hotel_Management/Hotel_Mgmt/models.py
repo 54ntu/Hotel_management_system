@@ -46,3 +46,31 @@ class RoomBooking(models.Model):
 
 
 
+class Suppliers(models.Model):
+     name = models.CharField(max_length=100)
+     phone = models.CharField(max_length=15)
+     email = models.EmailField(max_length=50,unique=True)
+     address = models.CharField(max_length=100)
+
+
+
+class StaffProfile(models.Model):
+     ROLE_CHOICES =[
+          ('frontdesk','FrontDesk'),
+          ('housekeeping','HouseKeeping'),
+          ('management','Management')
+     ]
+     user = models.ForeignKey(User,on_delete=models.CASCADE)
+     assigned_task = models.CharField(max_length=100)
+     staff_role = models.CharField(choices=ROLE_CHOICES,max_length=50)
+     shift_start= models.TimeField()
+     shift_end = models.TimeField()
+
+
+
+
+class FeedBackModel(models.Model):
+     guest =models.ForeignKey(User,on_delete=models.CASCADE)
+     experience  = models.TextField(max_length=200)
+     
+
