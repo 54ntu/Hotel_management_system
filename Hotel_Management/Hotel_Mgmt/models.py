@@ -60,7 +60,7 @@ class StaffProfile(models.Model):
           ('housekeeping','HouseKeeping'),
           ('management','Management')
      ]
-     user = models.ForeignKey(User,on_delete=models.CASCADE)
+     staff_name = models.ForeignKey(User,on_delete=models.CASCADE)
      assigned_task = models.CharField(max_length=100)
      staff_role = models.CharField(choices=ROLE_CHOICES,max_length=50)
      shift_start= models.TimeField()
@@ -72,5 +72,5 @@ class StaffProfile(models.Model):
 class FeedBackModel(models.Model):
      guest =models.ForeignKey(User,on_delete=models.CASCADE)
      experience  = models.TextField(max_length=200)
-     
+
 
