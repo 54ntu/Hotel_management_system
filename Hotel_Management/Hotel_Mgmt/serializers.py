@@ -26,3 +26,10 @@ class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suppliers
         fields =['id','name','phone','email','address']
+
+
+
+class StaffManagementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaffProfile
+        fields = ['id','staff_name','staff_role','assigned_task','task_status','shift_start','shift_end']

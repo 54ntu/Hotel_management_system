@@ -79,8 +79,9 @@ class StaffProfile(models.Model):
           ('management','Management')
      ]
      staff_name = models.ForeignKey(User,on_delete=models.CASCADE)
-     assigned_task = models.CharField(max_length=100)
      staff_role = models.CharField(choices=ROLE_CHOICES,max_length=50)
+     assigned_task = models.CharField(max_length=100)
+     task_status = models.BooleanField(default=False)
      shift_start= models.TimeField()
      shift_end = models.TimeField()
 

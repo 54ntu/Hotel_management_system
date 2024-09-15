@@ -7,7 +7,7 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 
@@ -19,12 +19,25 @@ User = get_user_model()
 #when we use modelviewset it provides all CRUD operations
 #but when we use genericvieset with createmodelMixins or other mixins we specifically define the method like whether it is a create or update or delete or get operations
 
+
+
+#viewsets for managing the staffProfile and assigning the task to the stafff....
+class StaffManagementViewsets(ModelViewSet):
+    queryset = StaffProfile.objects.all()
+    serializer_class = StaffManagementSerializer
+    
+
+
+
+#this viewset is for managing the category of the inventory item where only the logged in admin can manage this category
 class CategoryViewsets(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated,IsAdminOrReadOnly]   #here only the admin is able to perform crud operations and user must have login to see the details
 
 
+
+#this viewset is for managing the inventory of the various category
 class InventoryViewsets(ModelViewSet):
     queryset = InventoryItem.objects.all()
     serializer_class= InventoryItemSerializer
@@ -58,6 +71,13 @@ class InventoryViewsets(ModelViewSet):
         send_mail(subject,message,email_from, recipient_list)
     
         
+
+
+
+
+
+
+
 
 
 class SupplierInfoViewset(ModelViewSet):
