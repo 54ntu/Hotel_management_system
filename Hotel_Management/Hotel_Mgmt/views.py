@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
 from .serializers import CategorySerializer,InventoryItemSerializer,FeedBackSerializer
 from rest_framework.exceptions import PermissionDenied
+from django.core.mail import send_mail
 
 
 
@@ -30,12 +31,47 @@ class InventoryViewsets(ModelViewSet):
     permission_classes =[IsAuthenticated,IsAdminOrReadOnly]
 
 
+    def update(self, request, *args, **kwargs):
+        #call the original update method to perform the actual update operation
+        response= super().update(request, *args, **kwargs)
 
-class FeedBackViewsets(ModelViewSet):
+
+        #get the updated inventory item 
+        inventory_item = self.get_object()
+        print(f"inventory item which gets updated is : {inventory_item}")
+
+        #now check if the items need reordering
+        if inventory_item.needs_reorder():
+             self.send_reorder_alert(inventory_item)
+
+
+        #if reordering is not needed then just return the updated inventory item
+        return response
+    
+
+
+    def send_reorder_alert(self,inventory_item):
+        subject = 'Reorder Alert : Inventory item is running low..!!!'
+        message =(
+            f"The inventory item {inventory_item.name} of category {inventory_item.category} is running low. Current quantity :{inventory_item.quantity}"
+        )
+        email_from  = "xaudharysantey12@gmail.com"
+        recipient_list = ['lazypy12@gmail.com']
+        send_mail(subject,message,email_from, recipient_list)
+    
+        
+
+
+
+
+
+
+
+class FeedBackViewsets(ModelViewSet):   
     queryset = FeedBackModel.objects.all()
     serializer_class = FeedBackSerializer
     permission_classes=[IsAuthenticated]   
-    
+
     def get_queryset(self):
         guest= self.request.user
         return self.queryset.filter(guest = guest)

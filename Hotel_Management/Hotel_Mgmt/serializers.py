@@ -16,7 +16,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
 
 class FeedBackSerializer(serializers.ModelSerializer):
-    guest = serializers.HiddenField(default= serializers.CurrentUserDefault())  
+    guest = serializers.HiddenField(default= serializers.CurrentUserDefault)  
     class Meta:
         model = FeedBackModel
         fields  = ['guest','experience']

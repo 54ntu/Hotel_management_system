@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 User = get_user_model()
@@ -15,6 +17,11 @@ class Category(models.Model):
 
 
 
+      def __str__(self):
+           return self.name
+
+
+
 class InventoryItem(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     name =models.CharField(max_length=50)
@@ -22,6 +29,13 @@ class InventoryItem(models.Model):
     description = models.CharField(max_length=100)
     reorder_limit= models.PositiveIntegerField(default=5)    # this one is triggered when the quantity becomes equal or less than the reorder limit
 
+    def __str__(self):
+         return f"{self.name} {self.category}"
+    
+
+    def needs_reorder(self):
+         return self.quantity <= self.reorder_limit
+    
 
 
 
@@ -38,6 +52,8 @@ class Room(models.Model):
      price = models.DecimalField(max_digits=4, decimal_places=2)
 
 
+     def __str__(self):
+          return self.room_no
 
 class RoomBooking(models.Model):
      booked_by = models.ForeignKey(User,on_delete=models.CASCADE)

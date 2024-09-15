@@ -9,7 +9,7 @@ class CategoryAdminModel(admin.ModelAdmin):
 
 @admin.register(InventoryItem)
 class InventoryItemAdminModel(admin.ModelAdmin):
-    list_display=("id","category","name","quantity","description",)
+    list_display=("id","category","name","quantity","reorder_limit","description",)
 
 
 @admin.register(Room)

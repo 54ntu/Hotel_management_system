@@ -1,6 +1,7 @@
 
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,10 +11,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-626a&#d(87lymulrkz^e#*$g2u^ph(q2fl@8wb+ahk2a&9_qtv'
+
+
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = 'django-insecure-626a&#d(87lymulrkz^e#*$g2u^ph(q2fl@8wb+ahk2a&9_qtv'
+
+
 DEBUG = True
+
+
 
 ALLOWED_HOSTS = []
 
@@ -124,3 +132,18 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
+
+
+
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'  # Your email provider's SMTP server
+EMAIL_PORT = 587  # Typically 587 for TLS, 465 for SSL
+EMAIL_USE_TLS = True  # Set to True if using TLS
+EMAIL_HOST_USER = '61eabe8f7ed379'
+EMAIL_HOST_PASSWORD = '9beec9613918ca'
+
+
+
