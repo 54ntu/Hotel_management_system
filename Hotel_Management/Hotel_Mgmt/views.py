@@ -7,7 +7,7 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import CategorySerializer,InventoryItemSerializer,FeedBackSerializer
+from .serializers import CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 
@@ -35,7 +35,6 @@ class InventoryViewsets(ModelViewSet):
         #call the original update method to perform the actual update operation
         response= super().update(request, *args, **kwargs)
 
-
         #get the updated inventory item 
         inventory_item = self.get_object()
         print(f"inventory item which gets updated is : {inventory_item}")
@@ -43,7 +42,6 @@ class InventoryViewsets(ModelViewSet):
         #now check if the items need reordering
         if inventory_item.needs_reorder():
              self.send_reorder_alert(inventory_item)
-
 
         #if reordering is not needed then just return the updated inventory item
         return response
@@ -62,9 +60,10 @@ class InventoryViewsets(ModelViewSet):
         
 
 
-
-
-
+class SupplierInfoViewset(ModelViewSet):
+    queryset = Suppliers.objects.all()
+    serializer_class  = SupplierSerializer
+    permission_classes = [IsAuthenticated,IsAdminOrReadOnly]
 
 
 class FeedBackViewsets(ModelViewSet):   

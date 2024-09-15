@@ -6,17 +6,23 @@ from .models import Category,FeedBackModel,InventoryItem,Room,RoomBooking,StaffP
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields  = ['name',]
+        fields  = ['id','name',]
 
 
 class InventoryItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = InventoryItem
-        fields = ['category','name','quantity','description']
+        fields = ['id','category','name','quantity','description']
 
 
 class FeedBackSerializer(serializers.ModelSerializer):
     guest = serializers.HiddenField(default= serializers.CurrentUserDefault)  
     class Meta:
         model = FeedBackModel
-        fields  = ['guest','experience']
+        fields  = ['id','guest','experience']
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suppliers
+        fields =['id','name','phone','email','address']
