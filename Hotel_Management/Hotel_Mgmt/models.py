@@ -20,6 +20,8 @@ class InventoryItem(models.Model):
     name =models.CharField(max_length=50)
     quantity= models.PositiveIntegerField()
     description = models.CharField(max_length=100)
+    reorder_limit= models.PositiveIntegerField(default=5)    # this one is triggered when the quantity becomes equal or less than the reorder limit
+
 
 
 
