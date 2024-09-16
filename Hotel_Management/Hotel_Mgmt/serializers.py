@@ -33,3 +33,9 @@ class StaffManagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffProfile
         fields = ['id','staff_name','staff_role','assigned_task','task_status','shift_start','shift_end']
+
+
+    def validate_staff_name(self,value):
+        if value.roles_choices != 'staff':
+            raise serializers.ValidationError("the selected user is not valid staff..!!")
+        return value

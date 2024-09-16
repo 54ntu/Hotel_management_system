@@ -18,6 +18,10 @@ class CustomUserModel(AbstractUser):
     roles_choices = models.CharField(choices=ROLE_CHOICES,max_length=50)
 
 
+    def __str__(self):
+        return self.email
+
+
 
     USERNAME_FIELD= "email"
     REQUIRED_FIELDS =[]

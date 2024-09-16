@@ -25,6 +25,8 @@ User = get_user_model()
 class StaffManagementViewsets(ModelViewSet):
     queryset = StaffProfile.objects.all()
     serializer_class = StaffManagementSerializer
+
+   
     
 
 
