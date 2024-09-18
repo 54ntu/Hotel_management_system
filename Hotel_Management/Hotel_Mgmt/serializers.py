@@ -39,3 +39,15 @@ class StaffManagementSerializer(serializers.ModelSerializer):
         if value.roles_choices != 'staff':
             raise serializers.ValidationError("the selected user is not valid staff..!!")
         return value
+    
+
+
+class RoomAdditionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['id','room_no','room_type','availability','price']
+
+class RoomAvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields =['id','availability','room_no','room_type']

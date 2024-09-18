@@ -1,7 +1,7 @@
 from django.urls  import path,include
 from rest_framework.routers   import DefaultRouter
 
-from .views import CategoryViewsets,FeedBackViewsets,InventoryViewsets,SupplierInfoViewset,StaffManagementViewsets
+from .views import CategoryViewsets,FeedBackViewsets,InventoryViewsets,SupplierInfoViewset,StaffManagementViewsets,RoomViewsets,RoomAvailabilityViewsets
 
 
 router = DefaultRouter()
@@ -11,6 +11,9 @@ router.register(r'feedback',FeedBackViewsets)  #here guest or anyone who is logg
 router.register(r'inventory',InventoryViewsets)
 router.register(r'supplier',SupplierInfoViewset)
 router.register(r'staff', StaffManagementViewsets)
+router.register(r'rooms',RoomViewsets)
+router.register(r'room-available',RoomAvailabilityViewsets,basename='room-available')
+
 
 
 urlpatterns = [

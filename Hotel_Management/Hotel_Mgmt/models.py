@@ -47,14 +47,22 @@ class Room(models.Model):
           ('suite','SUITE'),
 
      ]
+
+     ROOM_BOOKED ="BOOKED"
+     ROOM_AVAILABLE="AVAILABLE"
+     AVAILABILITY_CHOICES =  [
+          (ROOM_BOOKED,"BOOKED"),
+          (ROOM_AVAILABLE,"AVAILABLE")
+     ]
      room_no = models.PositiveIntegerField(unique=True)
      room_type= models.CharField(choices= ROOM_CHOICES,max_length=50)
-     availability = models.BooleanField(default= True)
-     price = models.DecimalField(max_digits=4, decimal_places=2)
+     availability = models.CharField(default= ROOM_AVAILABLE,max_length=10)
+     price = models.DecimalField(max_digits=6, decimal_places=2)
 
 
-     def __str__(self):
-          return self.room_no
+
+     
+
 
 class RoomBooking(models.Model):
      booked_by = models.ForeignKey(User,on_delete=models.CASCADE)

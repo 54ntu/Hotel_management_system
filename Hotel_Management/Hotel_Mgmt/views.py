@@ -7,7 +7,7 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,)
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 
@@ -77,9 +77,23 @@ class InventoryViewsets(ModelViewSet):
 
 
 
+#viewsets for managing room inventory
+class RoomViewsets(ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomAdditionSerializer
+    permission_classes = [IsAuthenticated,IsAdminOrReadOnly]
 
 
 
+class RoomAvailabilityViewsets(ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class= RoomAvailabilitySerializer
+
+
+    def list(self, request, *args, **kwargs):
+        available_rooms = self.queryset.filter(availability= Room.ROOM_AVAILABLE)
+        serializer = self.get_serializer(available_rooms,many=True)
+        return Response({'available_rooms':serializer.data},status=status.HTTP_200_OK)
 
 
 class SupplierInfoViewset(ModelViewSet):
