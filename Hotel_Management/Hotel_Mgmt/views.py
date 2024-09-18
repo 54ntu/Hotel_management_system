@@ -7,7 +7,7 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer)
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 
@@ -72,11 +72,7 @@ class InventoryViewsets(ModelViewSet):
         recipient_list = ['lazypy12@gmail.com']
         send_mail(subject,message,email_from, recipient_list)
     
-        
-
-
-
-
+    
 #viewsets for managing room inventory
 class RoomViewsets(ModelViewSet):
     queryset = Room.objects.all()
@@ -94,6 +90,31 @@ class RoomAvailabilityViewsets(ModelViewSet):
         available_rooms = self.queryset.filter(availability= Room.ROOM_AVAILABLE)
         serializer = self.get_serializer(available_rooms,many=True)
         return Response({'available_rooms':serializer.data},status=status.HTTP_200_OK)
+
+
+
+
+class RoomBookingViesets(ModelViewSet):
+    queryset = RoomBooking.objects.all()
+    serializer_class = RoombookingSerailizer
+    permission_classes=[IsAuthenticated]
+
+
+    def create(self, request, *args, **kwargs): 
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            room = serializer.validated_data['room_number']
+            print(f"room detail is : {room}")
+            if room.availability =="AVAILABLE":
+                self.perform_create(serializer)
+                #update the availability status of the room
+                room.availability= Room.ROOM_BOOKED
+                room.save()
+                return Response({'message':"room booked successfully...!!!"},status= status.HTTP_201_CREATED)
+            return Response({"error":"room is not available..!!"},status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+        return super().create(request, *args, **kwargs)
 
 
 class SupplierInfoViewset(ModelViewSet):
