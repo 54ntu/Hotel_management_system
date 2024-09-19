@@ -55,7 +55,8 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
 
 class RoombookingSerailizer(serializers.ModelSerializer):
     booked_by = serializers.CharField(default = serializers.CurrentUserDefault())
-    # room_number = serializers.SerializerMethodField()
+
     class Meta:
         model = RoomBooking
         fields = ['booked_by','check_in_date','check_out_date','room_number','any_request']
+        # here in room_number we are actually getting the foreignkey id 

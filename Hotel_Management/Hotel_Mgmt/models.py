@@ -50,9 +50,11 @@ class Room(models.Model):
 
      ROOM_BOOKED ="BOOKED"
      ROOM_AVAILABLE="AVAILABLE"
+     ROOM_CANCELLED ="CANCELLED"
      AVAILABILITY_CHOICES =  [
           (ROOM_BOOKED,"BOOKED"),
-          (ROOM_AVAILABLE,"AVAILABLE")
+          (ROOM_AVAILABLE,"AVAILABLE"),
+          (ROOM_CANCELLED,"CANCELLED")
      ]
      room_no = models.PositiveIntegerField(unique=True)
      room_type= models.CharField(choices= ROOM_CHOICES,max_length=50)
@@ -61,7 +63,7 @@ class Room(models.Model):
 
 
 
-     
+    
 
 
 class RoomBooking(models.Model):

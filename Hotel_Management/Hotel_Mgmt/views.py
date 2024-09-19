@@ -84,6 +84,7 @@ class RoomViewsets(ModelViewSet):
 class RoomAvailabilityViewsets(ModelViewSet):
     queryset = Room.objects.all()
     serializer_class= RoomAvailabilitySerializer
+    
 
 
     def list(self, request, *args, **kwargs):
@@ -92,19 +93,20 @@ class RoomAvailabilityViewsets(ModelViewSet):
         return Response({'available_rooms':serializer.data},status=status.HTTP_200_OK)
 
 
-
-
 class RoomBookingViesets(ModelViewSet):
     queryset = RoomBooking.objects.all()
+    # print(f"queryset datas we are getting : {queryset}")
     serializer_class = RoombookingSerailizer
     permission_classes=[IsAuthenticated]
 
 
     def create(self, request, *args, **kwargs): 
         serializer = self.get_serializer(data=request.data)
+        # print(serializer)
+
         if serializer.is_valid():
-            room = serializer.validated_data['room_number']
-            print(f"room detail is : {room}")
+            print(f"serialized datas are : {serializer.validated_data}")
+            room = serializer.validated_data['room_number']   # this will give us not only the foreignkey but also the room objects
             if room.availability =="AVAILABLE":
                 self.perform_create(serializer)
                 #update the availability status of the room
