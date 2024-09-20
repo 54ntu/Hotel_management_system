@@ -19,7 +19,7 @@ class RoomsAdminModel(admin.ModelAdmin):
 
 @admin.register(RoomBooking)
 class RoomBookingAdminModel(admin.ModelAdmin):
-    list_display= ('id','booked_by','check_in_date','check_out_date','room_number','any_request',)
+    list_display= ('id','booked_by','check_in_date','booking_status','check_out_date','room_number','any_request',)
 
 
 

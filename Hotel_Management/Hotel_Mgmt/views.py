@@ -7,9 +7,12 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer)
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from rest_framework import serializers
+from datetime import datetime
+from django.utils import timezone
 
 
 
@@ -106,17 +109,91 @@ class RoomBookingViesets(ModelViewSet):
 
         if serializer.is_valid():
             print(f"serialized datas are : {serializer.validated_data}")
-            room = serializer.validated_data['room_number']   # this will give us not only the foreignkey but also the room objects
+            room = serializer.validated_data['room_number'] 
+            checked_in_date = serializer.validated_data['check_in_date']
+            checked_out_date = serializer.validated_data['check_out_date']
+            # print(f"check in date and check out date are : {checked_in_date} {checked_out_date}")
+
+
+            #convert the both datetime to date
+            if isinstance(checked_in_date,datetime):
+                    checked_in_date = checked_in_date.date()
+            if isinstance(checked_out_date,datetime):
+                checked_out_date = checked_out_date.date()
+        
             if room.availability =="AVAILABLE":
-                self.perform_create(serializer)
-                #update the availability status of the room
-                room.availability= Room.ROOM_BOOKED
-                room.save()
-                return Response({'message':"room booked successfully...!!!"},status= status.HTTP_201_CREATED)
+                if checked_out_date<checked_in_date:
+                    raise serializers.ValidationError("check out date can not be earlier than check in date...!!!")
+                else:
+                    self.perform_create(serializer)
+                    #update the availability status of the room
+                    room.availability= Room.ROOM_BOOKED
+                    room.save()
+                    subject ='room booking'
+                    message="room has been booked successfully..!!"
+                    email_from = "hello@gmail.com"
+                    
+                    recipient_list = [serializer.validated_data['booked_by']]
+                    send_mail(subject,message,email_from,recipient_list)
+                    return Response({'message':"room booked successfully...!!!",'data':serializer.data},status= status.HTTP_201_CREATED)
             return Response({"error":"room is not available..!!"},status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
         return super().create(request, *args, **kwargs)
+    
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        print(f'instance value is : {instance}')
+        checked_in_date = request.data.get('check_in_date',instance.check_in_date)
+        checked_out_date= request.data.get('check_out_date',instance.check_out_date)
+        message_req = request.data.get('any_request',instance.any_request)
+        email_id = request.data.get('booked_by',instance.booked_by)
+        print(email_id)
+        # print(checked_in_date," - ",checked_out_date)
+
+        if checked_out_date<checked_in_date:
+            raise serializers.ValidationError('checkout date cannot be earlier than checkin date...!!')
+        
+
+        instance.check_in_date = checked_in_date
+        instance.check_out_date= checked_out_date
+        instance.any_request = message_req
+        instance.save()
+        subject = "room booking updated"
+        message="room booking has been updated...!!"
+        email_from = "hello@gmail.com"
+        # recipient_list = email_id
+        send_mail(subject,message,email_from,[email_id])
+
+        return Response({
+            'message':'room booking updated successfully...!!'
+        },status=status.HTTP_200_OK)
+
+
+class CancelBookingViewsets(ModelViewSet):
+    queryset = RoomBooking.objects.all()
+    serializer_class = CancelBookingSerializer
+
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # print(f"instance value is : {instance}")
+        instance.booking_status = RoomBooking.BOOKING_CANCELLED
+
+        room = instance.room_number
+        room.availability = Room.ROOM_AVAILABLE
+
+        instance.save()
+        room.save()
+
+        return Response({
+            "message":"booking has been cancelled successfully....!!",
+            "booking_id":instance.id
+        }, status=status.HTTP_200_OK)
+        
+
+
 
 
 class SupplierInfoViewset(ModelViewSet):
@@ -141,3 +218,7 @@ class FeedBackViewsets(ModelViewSet):
         if feedback.guest != self.request.user:
             raise PermissionDenied("you donot have permission to make changes..!!")
         return super().update(request, *args, **kwargs)
+    
+
+
+

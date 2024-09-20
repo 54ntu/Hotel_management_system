@@ -50,26 +50,37 @@ class Room(models.Model):
 
      ROOM_BOOKED ="BOOKED"
      ROOM_AVAILABLE="AVAILABLE"
-     ROOM_CANCELLED ="CANCELLED"
+     
+    
+
      AVAILABILITY_CHOICES =  [
           (ROOM_BOOKED,"BOOKED"),
           (ROOM_AVAILABLE,"AVAILABLE"),
-          (ROOM_CANCELLED,"CANCELLED")
      ]
      room_no = models.PositiveIntegerField(unique=True)
      room_type= models.CharField(choices= ROOM_CHOICES,max_length=50)
-     availability = models.CharField(default= ROOM_AVAILABLE,max_length=10)
+     availability = models.CharField(choices=AVAILABILITY_CHOICES,default= ROOM_AVAILABLE,max_length=10)
      price = models.DecimalField(max_digits=6, decimal_places=2)
 
+
+     def __str__(self):
+          return f"{self.room_no}"
 
 
     
 
 
 class RoomBooking(models.Model):
+     BOOKING_SUCCESS ="SUCCESS"
+     BOOKING_CANCELLED = "CANCELLED"
+     BOOKING_STATUS_CHOICES=[
+          (BOOKING_SUCCESS,"SUCCESS"),
+          (BOOKING_CANCELLED,"CANCELLED")
+     ]
      booked_by = models.ForeignKey(User,on_delete=models.CASCADE)
      check_in_date = models.DateTimeField()
      check_out_date = models.DateField()
+     booking_status = models.CharField(choices=BOOKING_STATUS_CHOICES,default=BOOKING_SUCCESS,max_length=15)
      room_number = models.ForeignKey(Room,on_delete= models.CASCADE)
      any_request = models.CharField(max_length=200)
 
