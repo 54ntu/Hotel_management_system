@@ -3,16 +3,19 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
-from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomBooking,Suppliers
+from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomBooking,Suppliers,Invoice
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer)
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer,BookingUpdateSerializer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from rest_framework import serializers
 from datetime import datetime
 from django.utils import timezone
+from django.db import transaction
+from datetime import timedelta
+from decimal import Decimal
 
 
 
@@ -124,18 +127,26 @@ class RoomBookingViesets(ModelViewSet):
             if room.availability =="AVAILABLE":
                 if checked_out_date<checked_in_date:
                     raise serializers.ValidationError("check out date can not be earlier than check in date...!!!")
-                else:
+                # Use transaction.atomic to ensure all operations are executed as a single transaction
+                with transaction.atomic():
                     self.perform_create(serializer)
                     #update the availability status of the room
                     room.availability= Room.ROOM_BOOKED
                     room.save()
+
+                    # Calculate total price based on the duration of stay
+                    duration = (checked_out_date - checked_in_date)
+                    total_days = duration.total_seconds() /(24*3600)
+                    total_price = Decimal(total_days) * room.price
+                    invoice = Invoice.objects.create(booking= serializer.instance, amount_due = total_price)
+
                     subject ='room booking'
                     message="room has been booked successfully..!!"
                     email_from = "hello@gmail.com"
-                    
+                        
                     recipient_list = [serializer.validated_data['booked_by']]
                     send_mail(subject,message,email_from,recipient_list)
-                    return Response({'message':"room booked successfully...!!!",'data':serializer.data},status= status.HTTP_201_CREATED)
+                    return Response({'message':"room booked successfully...!!!",'data':serializer.data,'invoice_id':invoice.id},status= status.HTTP_201_CREATED)
             return Response({"error":"room is not available..!!"},status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
@@ -144,31 +155,48 @@ class RoomBookingViesets(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        print(f'instance value is : {instance}')
-        checked_in_date = request.data.get('check_in_date',instance.check_in_date)
-        checked_out_date= request.data.get('check_out_date',instance.check_out_date)
-        message_req = request.data.get('any_request',instance.any_request)
-        email_id = request.data.get('booked_by',instance.booked_by)
-        print(email_id)
-        # print(checked_in_date," - ",checked_out_date)
+        updated_serializer = BookingUpdateSerializer(data= request.data)
+        if updated_serializer.is_valid():
+
+            checked_in_date = updated_serializer.validated_data['check_in_date']
+            checked_out_date= updated_serializer.validated_data['check_out_date']
+            message_req = updated_serializer.validated_data['any_request']
+            email_id = request.data.get('booked_by',instance.booked_by)
+        if isinstance(checked_in_date,datetime):
+            checked_in_date = checked_in_date.date()
+        if isinstance(checked_out_date,datetime):
+             checked_out_date = checked_out_date.date()
 
         if checked_out_date<checked_in_date:
             raise serializers.ValidationError('checkout date cannot be earlier than checkin date...!!')
         
+        with transaction.atomic():
 
-        instance.check_in_date = checked_in_date
-        instance.check_out_date= checked_out_date
-        instance.any_request = message_req
-        instance.save()
-        subject = "room booking updated"
-        message="room booking has been updated...!!"
-        email_from = "hello@gmail.com"
-        # recipient_list = email_id
-        send_mail(subject,message,email_from,[email_id])
+            instance.check_in_date = checked_in_date
+            instance.check_out_date= checked_out_date
+            instance.any_request = message_req
+            instance.save()
+            
+            #calculate the updated stay days and find out the total amount and update the invoice data
+            duration = (checked_out_date - checked_in_date)
+            total_days = duration.total_seconds() / (24*3600)
+            total_amount = Decimal(total_days) * instance.room_number.price
+            #check if invoice is already generated or not if already exist just update that and if not then generate new invoice
+            invoice , _ = Invoice.objects.get_or_create(booking = instance , amount_due= total_amount)
+            invoice.save()
 
-        return Response({
-            'message':'room booking updated successfully...!!'
-        },status=status.HTTP_200_OK)
+            subject = "room booking updated"
+            message="room booking has been updated...!!"
+            email_from = "hello@gmail.com"
+            # recipient_list = email_id
+            send_mail(subject,message,email_from,[email_id])
+
+            return Response({
+                'message':'room booking updated successfully...!!',
+                'invoice_id': invoice.id,\
+                "total_due_amount":total_amount,
+                "total_days_of_booking":total_days
+            },status=status.HTTP_200_OK)
 
 
 class CancelBookingViewsets(ModelViewSet):
@@ -178,13 +206,14 @@ class CancelBookingViewsets(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+    
+        
         # print(f"instance value is : {instance}")
         instance.booking_status = RoomBooking.BOOKING_CANCELLED
 
         room = instance.room_number
         room.availability = Room.ROOM_AVAILABLE
-
-        instance.save()
+        instance.delete()
         room.save()
 
         return Response({

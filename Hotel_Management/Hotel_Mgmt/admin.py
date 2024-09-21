@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category,InventoryItem,RoomBooking,Room,FeedBackModel,StaffProfile,Suppliers
+from .models import Category,InventoryItem,RoomBooking,Room,FeedBackModel,StaffProfile,Suppliers,Invoice
 
 # Register your models here.
 @admin.register(Category)
@@ -38,3 +38,9 @@ class SuppliersAdminModel(admin.ModelAdmin):
 @admin.register(FeedBackModel)
 class FeedBackAdminModel(admin.ModelAdmin):
     list_display = ('id','guest','experience',)
+
+
+
+@admin.register(Invoice)
+class InvoiceAdminModel(admin.ModelAdmin):
+    list_display = ('id','booking','amount_due','issued_date','is_paid')

@@ -84,6 +84,20 @@ class RoomBooking(models.Model):
      room_number = models.ForeignKey(Room,on_delete= models.CASCADE)
      any_request = models.CharField(max_length=200)
 
+     def __str__(self):
+          return f"{self.id}- {self.booked_by}"
+
+
+class Invoice(models.Model):
+     booking  = models.ForeignKey(RoomBooking,on_delete=models.CASCADE)
+     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+     issued_date = models.DateTimeField(auto_now_add=True)
+     is_paid = models.BooleanField(default= False)
+
+
+     def __str__(self):
+          return f"Invoice {self.id} for booking {self.booking.id}"
+     
 
 
 class Suppliers(models.Model):
