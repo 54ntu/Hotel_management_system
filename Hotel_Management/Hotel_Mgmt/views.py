@@ -171,7 +171,6 @@ class RoomBookingViesets(ModelViewSet):
             raise serializers.ValidationError('checkout date cannot be earlier than checkin date...!!')
         
         with transaction.atomic():
-
             instance.check_in_date = checked_in_date
             instance.check_out_date= checked_out_date
             instance.any_request = message_req
@@ -182,9 +181,13 @@ class RoomBookingViesets(ModelViewSet):
             total_days = duration.total_seconds() / (24*3600)
             total_amount = Decimal(total_days) * instance.room_number.price
             #check if invoice is already generated or not if already exist just update that and if not then generate new invoice
-            invoice , _ = Invoice.objects.get_or_create(booking = instance , amount_due= total_amount)
-            invoice.save()
+            try:
+                invoice = Invoice.objects.get(booking= instance) #chceck whether invoice is already exists
+                invoice.amount_due = total_amount
+            except Invoice.DoesNotExist:
+                invoice = Invoice(booking=instance,amount_due =total_amount)
 
+            invoice.save()
             subject = "room booking updated"
             message="room booking has been updated...!!"
             email_from = "hello@gmail.com"
@@ -223,6 +226,10 @@ class CancelBookingViewsets(ModelViewSet):
         
 
 
+class InvoiceViewsets(ModelViewSet):
+    queryset = Invoice.objects.all()
+
+
 
 
 class SupplierInfoViewset(ModelViewSet):
@@ -248,6 +255,3 @@ class FeedBackViewsets(ModelViewSet):
             raise PermissionDenied("you donot have permission to make changes..!!")
         return super().update(request, *args, **kwargs)
     
-
-
-

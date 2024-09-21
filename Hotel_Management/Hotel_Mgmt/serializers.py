@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category,FeedBackModel,InventoryItem,Room,RoomBooking,StaffProfile,Suppliers
+from .models import Category,FeedBackModel,InventoryItem,Room,RoomBooking,StaffProfile,Suppliers,Invoice
 
 
 
@@ -72,4 +72,9 @@ class CancelBookingSerializer(serializers.ModelSerializer):
         model = RoomBooking
         fields =[]
 
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields =['id','booking','amount_due','issued_date','is_paid']
  
