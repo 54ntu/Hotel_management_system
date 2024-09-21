@@ -7,7 +7,7 @@ from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomB
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer,BookingUpdateSerializer)
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer,BookingUpdateSerializer,InvoiceSerializer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from rest_framework import serializers
@@ -228,6 +228,7 @@ class CancelBookingViewsets(ModelViewSet):
 
 class InvoiceViewsets(ModelViewSet):
     queryset = Invoice.objects.all()
+    serializer_class = InvoiceSerializer
 
 
 

@@ -74,6 +74,7 @@ class CancelBookingSerializer(serializers.ModelSerializer):
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
+    booking = RoombookingSerailizer()
     class Meta:
         model = Invoice
         fields =['id','booking','amount_due','issued_date','is_paid']
