@@ -22,6 +22,7 @@ class GuestRegisterationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        
         validated_data['password'] = make_password(validated_data['password'])
         validated_data['roles_choices'] = 'guest'
         return User.objects.create(**validated_data)

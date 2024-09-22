@@ -55,6 +55,7 @@ class RoomAvailabilitySerializer(serializers.ModelSerializer):
 
 class RoombookingSerailizer(serializers.ModelSerializer):
     booked_by = serializers.CharField(default = serializers.CurrentUserDefault())
+   
     class Meta:
         model = RoomBooking
         fields = ['id','booked_by','check_in_date','check_out_date','room_number','any_request','booking_status']
@@ -77,5 +78,5 @@ class InvoiceSerializer(serializers.ModelSerializer):
     booking = RoombookingSerailizer()
     class Meta:
         model = Invoice
-        fields =['id','booking','amount_due','issued_date','is_paid']
+        fields =['id','booking','amount_due','issued_date','is_paid',]
  

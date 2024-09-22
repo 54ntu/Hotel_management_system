@@ -101,7 +101,7 @@ class RoomAvailabilityViewsets(ModelViewSet):
 
 class RoomBookingViesets(ModelViewSet):
     queryset = RoomBooking.objects.all()
-    # print(f"queryset datas we are getting : {queryset}")
+    print(f"queryset datas we are getting : {queryset}")
     serializer_class = RoombookingSerailizer
     permission_classes=[IsAuthenticated]
 
@@ -109,7 +109,7 @@ class RoomBookingViesets(ModelViewSet):
     def create(self, request, *args, **kwargs): 
         serializer = self.get_serializer(data=request.data)
         # print(serializer)
-
+        
         if serializer.is_valid():
             print(f"serialized datas are : {serializer.validated_data}")
             room = serializer.validated_data['room_number'] 
@@ -136,9 +136,9 @@ class RoomBookingViesets(ModelViewSet):
 
                     # Calculate total price based on the duration of stay
                     duration = (checked_out_date - checked_in_date)
-                    total_days = duration.total_seconds() /(24*3600)
+                    total_days = duration.days
                     total_price = Decimal(total_days) * room.price
-                    invoice = Invoice.objects.create(booking= serializer.instance, amount_due = total_price)
+                    invoice = Invoice.objects.create(booking= serializer.instance, amount_due = total_price,total_stay=duration)
 
                     subject ='room booking'
                     message="room has been booked successfully..!!"
@@ -152,6 +152,9 @@ class RoomBookingViesets(ModelViewSet):
     
         return super().create(request, *args, **kwargs)
     
+
+
+
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -178,7 +181,7 @@ class RoomBookingViesets(ModelViewSet):
             
             #calculate the updated stay days and find out the total amount and update the invoice data
             duration = (checked_out_date - checked_in_date)
-            total_days = duration.total_seconds() / (24*3600)
+            total_days = duration.days
             total_amount = Decimal(total_days) * instance.room_number.price
             #check if invoice is already generated or not if already exist just update that and if not then generate new invoice
             try:
@@ -205,10 +208,15 @@ class RoomBookingViesets(ModelViewSet):
 class CancelBookingViewsets(ModelViewSet):
     queryset = RoomBooking.objects.all()
     serializer_class = CancelBookingSerializer
+    permission_classes =[IsAuthenticated]
 
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.booked_by != request.user:
+            return Response({
+                'message':'you are not valid to perform this action'
+            },status=status.HTTP_401_UNAUTHORIZED)
     
         
         # print(f"instance value is : {instance}")

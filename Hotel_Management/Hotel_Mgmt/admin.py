@@ -43,4 +43,4 @@ class FeedBackAdminModel(admin.ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdminModel(admin.ModelAdmin):
-    list_display = ('id','booking','amount_due','issued_date','is_paid')
+    list_display = ('id','booking','total_stay','amount_due','issued_date','is_paid',)

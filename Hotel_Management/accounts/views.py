@@ -33,7 +33,7 @@ class GuestRegistrationView(GenericViewSet,CreateModelMixin):
             serializer.is_valid(raise_exception=True)
 
             user = authenticate(
-                  username = serializer.validated_data['email'],
+               username = serializer.validated_data['email'],
                password = serializer.validated_data['password']
             )
 
