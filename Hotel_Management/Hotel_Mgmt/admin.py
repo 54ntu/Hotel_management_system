@@ -26,7 +26,7 @@ class RoomBookingAdminModel(admin.ModelAdmin):
 
 @admin.register(StaffProfile)
 class StaffAdminModel(admin.ModelAdmin):
-    list_display= ('id','staff_name','assigned_task','staff_role','shift_start','shift_end',)
+    list_display= ('id','staff_name','assigned_task','staff_role','shift_start','shift_end','task_status')
 
 
 @admin.register(Suppliers)

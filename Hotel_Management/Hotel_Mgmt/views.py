@@ -31,6 +31,7 @@ User = get_user_model()
 class StaffManagementViewsets(ModelViewSet):
     queryset = StaffProfile.objects.all()
     serializer_class = StaffManagementSerializer
+    permission_classes = [IsAuthenticated,IsAdminOrReadOnly]
 
    
 #this viewset is for managing the category of the inventory item where only the logged in admin can manage this category

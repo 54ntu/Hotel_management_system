@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Category,FeedBackModel,InventoryItem,Room,RoomBooking,StaffProfile,Suppliers,Invoice
+from accounts.models import CustomUserModel
 
 
 
@@ -30,6 +31,7 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 class StaffManagementSerializer(serializers.ModelSerializer):
+    staff_name = serializers.PrimaryKeyRelatedField(queryset =CustomUserModel.objects.all() )
     class Meta:
         model = StaffProfile
         fields = ['id','staff_name','staff_role','assigned_task','task_status','shift_start','shift_end']
@@ -37,7 +39,7 @@ class StaffManagementSerializer(serializers.ModelSerializer):
 
     def validate_staff_name(self,value):
         if value.roles_choices != 'staff':
-            raise serializers.ValidationError("the selected user is not valid staff..!!")
+            raise serializers.ValidationError("the selected user is not a staff..!!")
         return value
     
 
