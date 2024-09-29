@@ -43,8 +43,23 @@ class StaffTaskViewsets(ModelViewSet):
 
     def get_queryset(self):
         return StaffProfile.objects.filter(staff_name = self.request.user)
+    
 
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # print(f"instance we are getting is : {instance}")
+        serializer = self.get_serializer(instance,data = request.data,partial=True)
+        # print(f"serializer value is : {serializer}")
+        serializer.is_valid(raise_exception=True)
+        task_status = serializer.validated_data.get("task_status",instance.task_status)
+        # print(f"task_status value is : {task_status}")
+        if task_status:
+            instance.delete()
+            return Response({"message":"task is deleted as it is completed.!"},status=status.HTTP_204_NO_CONTENT)
+        #perform with the normal update
+        self.perform_update(serializer)
+        return Response(serializer.data)
     
 
 
