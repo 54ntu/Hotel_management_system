@@ -40,8 +40,25 @@ class StaffManagementSerializer(serializers.ModelSerializer):
     def validate_staff_name(self,value):
         if value.roles_choices != 'staff':
             raise serializers.ValidationError("the selected user is not a staff..!!")
+        
+
+         #check if the staff has any uncompleted task or not (task_status=false)
+        if StaffProfile.objects.filter(staff_name= value, task_status=False).exists():
+            raise serializers.ValidationError(f"{value} already has uncompleted task. Assign task only after completing the task.")
+        
         return value
-    
+
+       
+        
+class StaffTaskSerializer(serializers.ModelSerializer):
+    staff_name = serializers.StringRelatedField()
+    class Meta:
+        model = StaffProfile
+        fields = ['id','staff_name','staff_role','assigned_task','task_status','shift_start','shift_end']
+
+
+
+
 
 
 class RoomAdditionSerializer(serializers.ModelSerializer):

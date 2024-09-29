@@ -1,7 +1,7 @@
 from django.urls  import path,include
 from rest_framework.routers   import DefaultRouter
 
-from .views import CategoryViewsets,FeedBackViewsets,InventoryViewsets,SupplierInfoViewset,StaffManagementViewsets,RoomViewsets,RoomAvailabilityViewsets,RoomBookingViesets,CancelBookingViewsets,InvoiceViewsets
+from .views import CategoryViewsets,FeedBackViewsets,InventoryViewsets,SupplierInfoViewset,StaffManagementViewsets,RoomViewsets,RoomAvailabilityViewsets,RoomBookingViesets,CancelBookingViewsets,InvoiceViewsets,StaffTaskViewsets
 
 
 router = DefaultRouter()
@@ -16,6 +16,7 @@ router.register(r'room-available',RoomAvailabilityViewsets,basename='room-availa
 router.register(r'roombookings',RoomBookingViesets)
 router.register(r'cancelBooking',CancelBookingViewsets ,basename='cancel-booking')
 router.register(r'invoice',InvoiceViewsets)
+router.register(r'staffViewsets',StaffTaskViewsets,basename='staff-viewsets')
 
 
 

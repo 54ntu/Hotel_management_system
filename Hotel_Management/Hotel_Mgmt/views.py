@@ -6,8 +6,8 @@ from rest_framework import status
 from .models import Category,FeedBackModel,InventoryItem,Room,StaffProfile,RoomBooking,Suppliers,Invoice
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsAdminOrReadOnly
-from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer,BookingUpdateSerializer,InvoiceSerializer)
+from .permissions import IsAdminOrReadOnly,IsStaff
+from .serializers import (CategorySerializer,InventoryItemSerializer,FeedBackSerializer,SupplierSerializer,StaffManagementSerializer,RoomAdditionSerializer,RoomAvailabilitySerializer,RoombookingSerailizer,CancelBookingSerializer,BookingUpdateSerializer,InvoiceSerializer,StaffTaskSerializer)
 from rest_framework.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from rest_framework import serializers
@@ -32,6 +32,21 @@ class StaffManagementViewsets(ModelViewSet):
     queryset = StaffProfile.objects.all()
     serializer_class = StaffManagementSerializer
     permission_classes = [IsAuthenticated,IsAdminOrReadOnly]
+
+
+#viewsets for staff who can see their task assign by the admins and also they can update that task....
+class StaffTaskViewsets(ModelViewSet):
+    queryset = StaffProfile.objects.all()
+    print(f"queryset datas are : {queryset}")
+    serializer_class = StaffTaskSerializer
+    permission_classes = [IsAuthenticated,IsStaff]
+
+    def get_queryset(self):
+        return StaffProfile.objects.filter(staff_name = self.request.user)
+
+
+    
+
 
    
 #this viewset is for managing the category of the inventory item where only the logged in admin can manage this category
