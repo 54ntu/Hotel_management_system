@@ -16,8 +16,6 @@ class Category(models.Model):
     )
       name = models.CharField(choices= CATEGORY_CHOICES  ,max_length=100)
 
-
-
       def __str__(self):
            return self.name
 
@@ -49,10 +47,7 @@ class Room(models.Model):
      ]
 
      ROOM_BOOKED ="BOOKED"
-     ROOM_AVAILABLE="AVAILABLE"
-     
-    
-
+     ROOM_AVAILABLE="AVAILABLE"    
      AVAILABILITY_CHOICES =  [
           (ROOM_BOOKED,"BOOKED"),
           (ROOM_AVAILABLE,"AVAILABLE"),
@@ -65,9 +60,6 @@ class Room(models.Model):
 
      def __str__(self):
           return f"{self.room_no}"
-
-
-    
 
 
 class RoomBooking(models.Model):
@@ -85,7 +77,7 @@ class RoomBooking(models.Model):
      any_request = models.CharField(max_length=200)
 
      def __str__(self):
-          return f"{self.id}- {self.booked_by}"
+          return f"{self.id} - {self.booked_by}"
 
 
 class Invoice(models.Model):
@@ -121,8 +113,6 @@ class StaffProfile(models.Model):
      task_status = models.BooleanField(default=False)
      shift_start= models.TimeField()
      shift_end = models.TimeField()
-
-
 
 
 class FeedBackModel(models.Model):
