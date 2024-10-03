@@ -107,7 +107,7 @@ class StaffProfile(models.Model):
           ('housekeeping','HouseKeeping'),
           ('management','Management')
      ]
-     staff_name = models.ForeignKey(CustomUserModel,on_delete=models.CASCADE,limit_choices_to={'roles_choices':'staff'})
+     staff_name = models.ForeignKey(CustomUserModel,on_delete=models.CASCADE,limit_choices_to={'roles_choices':'staff'},blank=False,null=False)
      staff_role = models.CharField(choices=ROLE_CHOICES,max_length=50)
      assigned_task = models.CharField(max_length=100)
      task_status = models.BooleanField(default=False)

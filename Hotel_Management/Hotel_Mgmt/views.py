@@ -61,7 +61,7 @@ class StaffTaskViewsets(ModelViewSet):
         self.perform_update(serializer)
         return Response(serializer.data)
     
-
+ 
 
    
 #this viewset is for managing the category of the inventory item where only the logged in admin can manage this category
@@ -269,6 +269,11 @@ class InvoiceViewsets(ModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     permission_classes = [IsAuthenticated]
+
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(booking__booked_by =user)
 
    
 
